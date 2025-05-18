@@ -1,4 +1,5 @@
-3 files here
+5 files here
 arduino code for upload
 arduino code in PDF file
-Breadboard layout using Fritzing
+Breadboard layout using IR sesnors
+Breadboard layout using Photocell sesnors
