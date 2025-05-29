@@ -13,6 +13,9 @@
 //  then it will go back HIGH when the speedometer resets
 //
 //  The display is a standard 2x16 LCD display with I2C board attached
+//  
+//  If you wish to use Photocells.  I have found the best version(s) to use without changing the code 
+//  are the 5528 and 5537 photocells
 //
 //  
 #include <LCD_I2C.h>
