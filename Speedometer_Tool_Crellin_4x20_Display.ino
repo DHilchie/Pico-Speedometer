@@ -15,7 +15,11 @@
 //
 //  The display is a standard 4x20 LCD display with I2C board attached
 //  On the display connect SCL to A5 and SDA to A4
-//  
+//    
+//  If you wish to use Photocells.  I have found the best version(s) to use without changing the code 
+//  are the 5528 and 5537 photocells
+//
+//
 #include <LCD_I2C.h>
 
 LCD_I2C lcd(0x27,20,4);
