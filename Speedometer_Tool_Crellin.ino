@@ -13,18 +13,19 @@
 //  then it will go back HIGH when the speedometer resets
 //
 //  The display is a standard 2x16 LCD display with I2C board attached
+//  On the display connect SCL to A5 and SDA to A4
 //  
 //  If you wish to use Photocells.  I have found the best version(s) to use without changing the code 
 //  are the 5528 and 5537 photocells
 //
-//  
+//
 #include <LCD_I2C.h>
 
 LCD_I2C lcd(0x27,16,2);
 
 unsigned long time1 = 0;
 unsigned long time2 = 0;
-float dist1 = 2.25;  // change this to reflect the correct distance between sensors
+float dist1 = 2.25;  // <--change this to reflect the correct distance between sensors
 float rate1;
 float sec1;
 float feet1;
@@ -35,8 +36,10 @@ unsigned long startmillis=0;
 unsigned long endmillis=0;
 
 void setup(){
-  pinMode(12,OUTPUT);
-  digitalWrite(12, HIGH);
+  pinMode(13,OUTPUT);   //On board LED
+  digitalWrite(13,LOW); //Make sure on board LED is off
+  pinMode(12,OUTPUT);      //Status LED
+  digitalWrite(12, LOW);  //turn off status LED so you know nothing has been triggered
   lcd.begin();
   lcd.clear();
   lcd.backlight();
@@ -98,7 +101,7 @@ void countleft(int value1, int value2){
     endmillis=(millis());
     countState=ST_DONE;
   }
-  digitalWrite(12, LOW);
+  digitalWrite(12, HIGH);  //turn on status LED while waiting for second trigger
 }
 
 void countright(int value1, int value2){
@@ -106,7 +109,7 @@ void countright(int value1, int value2){
     endmillis=(millis());
     countState=ST_DONE;
   }
-  digitalWrite(12, LOW);
+  digitalWrite(12, HIGH);  //turn on status LED while waiting for second trigger
 }
 
 void countdone(int value1, int value2){
@@ -129,7 +132,7 @@ void countreset(int value1, int value2){
   lcd.clear();
   lcd.setCursor(2,0);
   lcd.print("RESETTING");
-  digitalWrite(12, HIGH);
+  digitalWrite(12, LOW);  //turn status LED back off
   delay(500);
   lcd.clear();
   lcd.setCursor(2,0);

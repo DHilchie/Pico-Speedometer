@@ -15,10 +15,9 @@
 //
 //  The display is a standard 4x20 LCD display with I2C board attached
 //  On the display connect SCL to A5 and SDA to A4
-//    
+//  
 //  If you wish to use Photocells.  I have found the best version(s) to use without changing the code 
 //  are the 5528 and 5537 photocells
-//
 //
 #include <LCD_I2C.h>
 
@@ -42,7 +41,7 @@ void setup(){
   pinMode(13,OUTPUT);      //On board LED
   digitalWrite(13,LOW);    //Make sure on board LED is off
   pinMode(12,OUTPUT);      //Status LED
-  digitalWrite(12, HIGH);  //turn on status LED so you know nothing has been triggered
+  digitalWrite(12, LOW);  //turn off status LED so you know nothing has been triggered
   lcd.begin();
   lcd.clear();
   lcd.backlight();
@@ -104,7 +103,7 @@ void countleft(int value1, int value2){
     endmillis=(millis());
     countState=ST_DONE;
   }
-  digitalWrite(12, LOW);  //turn off status LED while waiting for second trigger
+  digitalWrite(12, HIGH);  //turn on status LED while waiting for second trigger
 }
 
 void countright(int value1, int value2){
@@ -112,7 +111,7 @@ void countright(int value1, int value2){
     endmillis=(millis());
     countState=ST_DONE;
   }
-  digitalWrite(12, LOW);  //turn off status LED while waiting for second trigger
+  digitalWrite(12, HIGH);  //turn on status LED while waiting for second trigger
 }
 
 void countdone(int value1, int value2){
@@ -144,7 +143,7 @@ void countreset(int value1, int value2){
   lcd.clear();
   lcd.setCursor(5,0);
   lcd.print("RESETTING");
-  digitalWrite(12, HIGH);  //turn status LED back on
+  digitalWrite(12, LOW);  //turn status LED back off
   delay(750);
   lcd.clear();
   lcd.setCursor(4,0);
