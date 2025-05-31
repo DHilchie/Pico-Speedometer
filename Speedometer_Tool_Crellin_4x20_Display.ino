@@ -104,6 +104,8 @@ void countleft(int value1, int value2){
     countState=ST_DONE;
   }
   digitalWrite(12, HIGH);  //turn on status LED while waiting for second trigger
+  lcd.setCursor(19,3);
+  lcd.print("L");
 }
 
 void countright(int value1, int value2){
@@ -112,7 +114,9 @@ void countright(int value1, int value2){
     countState=ST_DONE;
   }
   digitalWrite(12, HIGH);  //turn on status LED while waiting for second trigger
-}
+  lcd.setCursor(19,3);
+  lcd.print("R");
+  }
 
 void countdone(int value1, int value2){
   time1=(endmillis-startmillis);
@@ -134,6 +138,7 @@ void countdone(int value1, int value2){
   lcd.setCursor(5,3);
   lcd.print(scale2);
   lcd.print(" mph");
+  digitalWrite(12, LOW);  //turn status LED back off
   delay(5000);
   countState=ST_RESET;
 }
@@ -143,7 +148,6 @@ void countreset(int value1, int value2){
   lcd.clear();
   lcd.setCursor(5,0);
   lcd.print("RESETTING");
-  digitalWrite(12, LOW);  //turn status LED back off
   delay(750);
   lcd.clear();
   lcd.setCursor(4,0);
