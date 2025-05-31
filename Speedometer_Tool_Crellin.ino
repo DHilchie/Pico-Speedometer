@@ -30,6 +30,8 @@ float rate1;
 float sec1;
 float feet1;
 float scale1;
+int scale2 = 0;
+int scale3 = 0;
 int sensor1 = A0;
 int sensor2 = A1;
 unsigned long startmillis=0;
@@ -43,13 +45,13 @@ void setup(){
   lcd.begin();
   lcd.clear();
   lcd.backlight();
-  lcd.setCursor(2,0);
+  lcd.setCursor(0,0);
   lcd.print("SPEEDOMETER");
-  lcd.setCursor(4,1);
+  lcd.setCursor(0,1);
   lcd.print("Startup");
   delay(1000);
-  lcd.setCursor(4,1);
-  lcd.print(" Ready   ");
+  lcd.setCursor(0,1);
+  lcd.print("Ready for HO");
 }
 enum COUNTSTATES
 {
@@ -102,7 +104,9 @@ void countleft(int value1, int value2){
     countState=ST_DONE;
   }
   digitalWrite(12, HIGH);  //turn on status LED while waiting for second trigger
-}
+  lcd.setCursor(15,1);
+  lcd.print("L");
+  }
 
 void countright(int value1, int value2){
   if (value2<500){
@@ -110,6 +114,8 @@ void countright(int value1, int value2){
     countState=ST_DONE;
   }
   digitalWrite(12, HIGH);  //turn on status LED while waiting for second trigger
+  lcd.setCursor(15,1);
+  lcd.print("R");
 }
 
 void countdone(int value1, int value2){
@@ -118,26 +124,34 @@ void countdone(int value1, int value2){
   feet1 = dist1/12.0;
   rate1 = feet1/sec1;
   scale1 = rate1*59.31;  //change the 59.31 to change scales or units 
+  scale1 = scale1 + 0.5;
+  scale1 = int(scale1);
+  scale3 = scale1;
   lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print("HO scale speed");
-  lcd.setCursor(3,1);
-  lcd.print(scale1);
+  lcd.print("Speed: ");
+  // lcd.setCursor(3,1);
+  lcd.print(scale3);
   lcd.print(" mph");
+  lcd.setCursor(0,1);
+  lcd.print("Last:  ");
+  lcd.print(scale2);
+  lcd.print(" mph");
+  digitalWrite(12, LOW);  //turn status LED back off
   delay(5000);
   countState=ST_RESET;
 }
 
 void countreset(int value1, int value2){
+  scale2 = scale1;
   lcd.clear();
   lcd.setCursor(2,0);
   lcd.print("RESETTING");
-  digitalWrite(12, LOW);  //turn status LED back off
   delay(500);
   lcd.clear();
-  lcd.setCursor(2,0);
+  lcd.setCursor(0,0);
   lcd.print("SPEEDOMETER");
-  lcd.setCursor(5,1);
-  lcd.print("Ready");
+  lcd.setCursor(0,1);
+  lcd.print("Ready for HO");
   countState=ST_OFF;
 }
