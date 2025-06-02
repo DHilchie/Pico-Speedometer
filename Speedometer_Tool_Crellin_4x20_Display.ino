@@ -7,11 +7,14 @@
 //  Can be adapted for other scales or to KPH by changing the scale rate
 //
 //  Once you have installed the sensors variable dist1 must be changed to the decimal distance in inches
+//  between the installed sensors
 //  example 2.25 is 2 and 1/4 inches distance between sensors
 //
-//  attach an LED with resistor to pin 12
-//  this LED will go LOW when the first sensor is triggered
-//  then it will go back HIGH when the speedometer resets
+//  Make sure the LCD_I2C library has been downloaded to your arduino IDE
+//
+//  You can choose to attach an LED with resistor to pin 12
+//  this LED will go HIGH when the first sensor is triggered
+//  then it will go back LOW when the speedometer resets
 //
 //  The display is a standard 4x20 LCD display with I2C board attached
 //  On the display connect SCL to A5 and SDA to A4
@@ -19,12 +22,15 @@
 //  If you wish to use Photocells.  I have found the best version(s) to use without changing the code 
 //  are the 5528 and 5537 photocells
 //
+//  code added to add the last reading to the display - May 2025
+//  code added to turn off the backlight if idle for 3 minutes. Any trigger turns it back on. - June 2025
+//
+//
 #include <LCD_I2C.h>
 
 LCD_I2C lcd(0x27,20,4);
 
 unsigned long time1 = 0;
-unsigned long time2 = 0;
 float dist1 = 2.25;  // <--change this to reflect the correct distance between sensors
 float rate1;
 float sec1;
@@ -36,6 +42,9 @@ int sensor1 = A0;
 int sensor2 = A1;
 unsigned long startmillis=0;
 unsigned long endmillis=0;
+unsigned long idlemillis1=0;
+unsigned long idlemillis2=0;
+unsigned long time2=0;
 
 void setup(){
   pinMode(13,OUTPUT);      //On board LED
@@ -52,6 +61,7 @@ void setup(){
   delay(1000);
   lcd.setCursor(6,2);
   lcd.print(" Ready   ");
+  idlemillis1=millis();
 }
 enum COUNTSTATES
 {
@@ -67,6 +77,11 @@ COUNTSTATES countState=ST_OFF;
 void loop (){
   int value1=analogRead(sensor1);
   int value2=analogRead(sensor2);
+  idlemillis2=millis();
+  time2=idlemillis2-idlemillis1;
+  if (time2 > 180000){
+    lcd.noBacklight();
+  }
   switch(countState)
  {
   case ST_OFF:
@@ -90,15 +105,19 @@ void loop (){
 void countoff(int value1, int value2){
   if (value1<500){
    startmillis=(millis());
+   time2=0;
    countState=ST_RIGHT;
   }
   if (value2<500){
    startmillis=(millis());
+   time2=0;
    countState=ST_LEFT;
   }
 }
 
 void countleft(int value1, int value2){
+  lcd.backlight();
+  time2=0;
   if (value1<500){
     endmillis=(millis());
     countState=ST_DONE;
@@ -109,6 +128,8 @@ void countleft(int value1, int value2){
 }
 
 void countright(int value1, int value2){
+  lcd.backlight();
+  time2=0;
   if (value2<500){
     endmillis=(millis());
     countState=ST_DONE;
@@ -127,6 +148,7 @@ void countdone(int value1, int value2){
   scale1 = scale1 + 0.5;
   scale1 = int(scale1);
   scale3 = scale1;
+  lcd.backlight();
   lcd.clear();
   lcd.setCursor(3,0);
   lcd.print("HO scale speed");
@@ -139,11 +161,13 @@ void countdone(int value1, int value2){
   lcd.print(scale2);
   lcd.print(" mph");
   digitalWrite(12, LOW);  //turn status LED back off
+  time2=0;
   delay(5000);
   countState=ST_RESET;
 }
 
 void countreset(int value1, int value2){
+  lcd.backlight();
   scale2 = scale1;
   lcd.clear();
   lcd.setCursor(5,0);
@@ -160,4 +184,6 @@ void countreset(int value1, int value2){
   lcd.print(scale2);
   lcd.print(" mph");
   countState=ST_OFF;
+  time2=0;
+  idlemillis1=millis();
 }
