@@ -1,58 +1,65 @@
-from machine import Pin, ADC, I2C
+from machine import Pin, I2C
 from time import sleep, ticks_ms
 import ssd1306
 
-# Setup I2C OLED
-i2c = I2C(1, scl=Pin(9), sda=Pin(8), freq=400000)
-oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+# Define I2C pins and OLED display address
+I2C_SCL_PIN = 9
+I2C_SDA_PIN = 8
+I2C_FREQ = 400000
+OLED_ADDR = 0x3d
 
-# Setup pins
-sensor1 = ADC(Pin(26))  # GP26 = ADC0
-sensor2 = ADC(Pin(27))  # GP27 = ADC1
+# Initialize I2C object and OLED display object
+i2c = I2C(0, scl=Pin(I2C_SCL_PIN), sda=Pin(I2C_SDA_PIN), freq=I2C_FREQ)
+oled = ssd1306.SSD1306_I2C(128, 64, i2c, addr=OLED_ADDR)
+
+# --- IR Sensors (digital input) ---
+sensor1 = Pin(10, Pin.IN, Pin.PULL_UP)  # IR sensor 1
+sensor2 = Pin(11, Pin.IN, Pin.PULL_UP)  # IR sensor 2
+
+# --- Status LED ---
 status_led = Pin(15, Pin.OUT)
 
-# Variables
-dist1 = 2.25  # inches between sensors
+# --- Variables ---
+dist1 = 2.25  # inches between IR sensors
 scale2 = 0
 count_state = 'OFF'
 startmillis = 0
 endmillis = 0
 idlemillis1 = ticks_ms()
 
-def analog_read(sensor):
-    return sensor.read_u16() >> 4  # ~0–4095
-
-def display_text(line1, line2="", line3="", line4=""):
+# --- Helper to draw 4 lines ---
+def display_text(line1="", line2="", line3="", line4=""):
     oled.fill(0)
-    oled.text(line1, 0, 0)
-    oled.text(line2, 0, 16)
-    oled.text(line3, 0, 32)
-    oled.text(line4, 0, 48)
+    if line1: oled.text(line1, 0, 0)
+    if line2: oled.text(line2, 0, 16)
+    if line3: oled.text(line3, 0, 32)
+    if line4: oled.text(line4, 0, 48)
     oled.show()
 
-# Initial display
+# --- Initial Screen ---
 display_text("SPEEDOMETER", "Ready for HO")
 
+# --- Main Loop ---
 while True:
-    value1 = analog_read(sensor1)
-    value2 = analog_read(sensor2)
+    val1 = sensor1.value()
+    val2 = sensor2.value()
     now = ticks_ms()
     idle_time = now - idlemillis1
 
     if idle_time > 180000:
-        oled.poweroff()  # Turn off OLED to save power
+        oled.poweroff()
 
     if count_state == 'OFF':
-        if value1 < 500:
+        if val1 == 0:  # sensor 1 triggered
             startmillis = ticks_ms()
             count_state = 'RIGHT'
-        elif value2 < 500:
+        elif val2 == 0:  # sensor 2 triggered
             startmillis = ticks_ms()
             count_state = 'LEFT'
 
     elif count_state == 'LEFT':
         oled.poweron()
-        if value1 < 500:
+        if val1 == 0:
             endmillis = ticks_ms()
             count_state = 'DONE'
         status_led.value(1)
@@ -60,7 +67,7 @@ while True:
 
     elif count_state == 'RIGHT':
         oled.poweron()
-        if value2 < 500:
+        if val2 == 0:
             endmillis = ticks_ms()
             count_state = 'DONE'
         status_led.value(1)
