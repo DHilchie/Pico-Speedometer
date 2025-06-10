@@ -1,3 +1,32 @@
+#  Speedometer program adapted by John Crellin May 2025
+#  This version was modified for a 4 line display
+#  original program written by DIY and Digital Railroad 
+#  https://youtu.be/Z_OI1jTq_2A?si=aiDp-qr3_nx_WhXf
+#  This version allows for the loco to start either left or right side
+#  It also converts to scale MPH for HO
+#  Can be adapted for other scales or to KPH by changing the scale rate
+#
+#  Once you have installed the sensors variable dist1 must be changed to the decimal distance in inches
+#  between the installed sensors
+#  example 2.25 is 2 and 1/4 inches distance between sensors
+#
+#  Make sure the LCD_I2C library has been downloaded to your arduino IDE
+#
+#  You can choose to attach an LED with resistor to pin 12
+#  this LED will go HIGH when the first sensor is triggered
+#  then it will go back LOW when the speedometer resets
+#
+#  The display is a standard 2x16 LCD display with I2C board attached
+#  On the display connect SCL to A5 and SDA to A4
+#  
+#  If you wish to use Photocells.  I have found the best version(s) to use without changing the code 
+#  are the 5528 and 5537 photocells
+#
+#  code added to add the last reading to the display - May 2025
+#  code added to turn off the backlight if idle for 3 minutes. Any trigger turns it back on. - June 2025
+#
+#  CHAT GPT converted code to run on Pi Pico using Micro Python, OLED display, and IR sensors. - 2025.06.09
+
 from machine import Pin, I2C
 from time import sleep, ticks_ms
 import ssd1306
