@@ -17,10 +17,10 @@ sensor1 = Pin(10, Pin.IN, Pin.PULL_UP)  # IR sensor 1
 sensor2 = Pin(11, Pin.IN, Pin.PULL_UP)  # IR sensor 2
 
 # --- Status LED ---
-status_led = Pin(15, Pin.OUT)
+status_led = Pin(14, Pin.OUT)
 
 # --- Variables ---
-dist1 = 2.25  # inches between IR sensors
+dist1 = 2.50  # inches between IR sensors
 scale2 = 0
 count_state = 'OFF'
 startmillis = 0
