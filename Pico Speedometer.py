@@ -3,7 +3,7 @@ from time import sleep, ticks_ms
 import ssd1306
 
 # Setup I2C OLED
-i2c = I2C(0, scl=Pin(1), sda=Pin(0), freq=400000)
+i2c = I2C(1, scl=Pin(9), sda=Pin(8), freq=400000)
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
 # Setup pins
